@@ -1,7 +1,7 @@
 fluidPage(
   
   # Application title
-  titlePanel("Old Faithful Geyser Data"),
+  titlePanel("IPDGC Project Tracker"),
   
   # Sidebar with a slider input for number of bins 
   sidebarLayout(
@@ -12,7 +12,7 @@ fluidPage(
     
     # Show a plot of the generated distribution
     mainPanel(
-      tableOutput("mainTable")
+      DTOutput("mainTable")
     )
   )
 )
