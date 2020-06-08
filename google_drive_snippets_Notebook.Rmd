@@ -1,0 +1,156 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+# package googledrive
+
+Using the googledrive package
+https://cran.r-project.org/web/packages/googledrive/googledrive.pdf
+
+```{r}
+##install googledrive package
+#install.packages("googledrive")
+
+#load package
+library(googledrive)
+```
+
+Now that the package is loaded, let's work with an example of the IPDGC project tracker sheet.
+We will use the as_dribble function. We can pass this function a file ID.
+
+Where to get our file ID? See this stackopverflow answer:
+https://stackoverflow.com/questions/15057907/how-to-get-the-file-id-so-i-can-perform-a-download-of-a-file-from-google-drive-a
+
+"...The easiest and fastest way to get a Google Drive file ID is from Google Drive on the web. 
+Right-click the file name and select Get shareable link. 
+The last part of the link is the file ID. Then you can cancel the sharing."
+
+This is the file ID for the example spreadsheet:
+https://docs.google.com/spreadsheets/d/1YBUOskdNmd1ZLiNJP5F-OS58lN5vBhYtrzSF_9HWoz0/edit?usp=sharing
+
+It looks like it prompts users to sign in with their google account.
+```{r}
+
+# specify the file id (substitute a real file id of your own!)
+IPDGC_exsheet <- as_dribble(as_id("1YBUOskdNmd1ZLiNJP5F-OS58lN5vBhYtrzSF_9HWoz0"))
+
+```
+
+For the real spreadsheet, I believe we use the as_team_drive function
+instead of as_dribble. Then users will sign in with their google account.
+```{r}
+
+## specify the id (substitute with real IPDGC spreadsheet file ID!)
+as_team_drive(as_id("0AOPK1X2jaNckUk9PVA"))
+
+```
+
+Let's look at some utility functions.
+```{r}
+
+is_dribble(IPDGC_exsheet) #is this even a dribble?
+
+is_mine(IPDGC_exsheet) #Is it mine?
+
+is_team_drive(IPDGC_exsheet)  #is it a team drive
+
+
+
+
+```
+
+Get info on Drive and Drive user capabilities
+```{r}
+drive_user()
+```
+
+I don't think the googledrive package allows you to edit exisiting sheets on Google Drive. 
+But there is a package called googlesheets4 which does this.
+
+# package googlesheets4:
+
+https://googlesheets4.tidyverse.org
+```{r}
+#install.packages("googlesheets4")
+library(googlesheets4)
+```
+
+googlesheets4 is pipe-friendly (and reexports %>%), but works just fine without the pipe.
+
+You can read googlesheets data from:
+
+a URL
+a Sheet ID
+a dribble produced by the googledrive package, which can lookup by file name
+```{r}
+
+#Authorize googlesheets4 to view and manage your Google Sheets.
+gs4_auth()
+
+#we can read from dribble object, created with googledrive package
+read_sheet(IPDGC_exsheet)
+
+#or we can read by using the url to the spreadsheet
+read_sheet("https://drive.google.com/open?id=1YBUOskdNmd1ZLiNJP5F-OS58lN5vBhYtrzSF_9HWoz0")
+```
+Note that we have an issue with this function because the actual column names dont begin until row 2.
+An easy fix is getting rid of the "Current Projects" cell and moving the rest of the sheet up to row 1.
+I think this is ideal, but here's another workaround
+```{r}
+
+my_sheet <- read_sheet(IPDGC_exsheet)
+
+colnames(my_sheet) <- my_sheet[1, ]
+colnames(my_sheet)
+
+```
+We can access the google sheet like a normal data.frame object
+```{r}
+
+dim(my_sheet) #dimensions
+
+my_sheet$Status #acess the Status column
+
+str(my_sheet)
+
+#print out each entry from every column
+sapply(colnames(my_sheet), function(x) my_sheet[, x])
+
+
+#Subset to show only ongoing projects
+subset(my_sheet, Status == "ongoing")
+
+#since googlesheets is part of the tidyverse, we can also use pipes with the magrittr package
+library(magrittr)
+
+my_sheet %>% subset(Status == "ongoing")
+
+#only show projects by a specific PI (e.g. Nalls)
+my_sheet[ grepl("Nall", my_sheet$`Proposed by (PI)`, ignore.case = T),  ] #the grepl functions returns a boolean vector indicating whether that cell/line contains "Nalls"
+
+```
+## Opening our googlesheet in the broswer
+```{r}
+gs4_browse(IPDGC_exsheet)
+```
+
+
+## Editing cells
+
+We can use the range_write function to edit our sheet
+Let's edit cell A3 and change it from "ongoing" to "test"
+Note that we need to wrap "test" inside as.data.frame
+
+If you have the google sheet open in your broswer, you can see these edits in real time.
+```{r}
+#edit
+range_write(IPDGC_exsheet, as.data.frame("test"), range = "A3")
+
+#revert back to "ongoing"
+range_write(IPDGC_exsheet, as.data.frame("ongoing"), range = "A3")
+
+
+```
+
+
