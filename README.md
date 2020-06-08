@@ -1,14 +1,14 @@
 # IPDGC Project Tracker
 2020 IPDGC Virtual Hackathon project
 #### Contributors:
-Artur Schuh
-Christelle Tesson
-David Tyrpak
-Jeff Kim
-Laurie Robak
-Monica Diez-Fairen
-Yuri Sosero
-Zalak Shah
+* Artur Schuh
+* Christelle Tesson
+* David Tyrpak
+* Jeff Kim
+* Laurie Robak
+* Monica Diez-Fairen
+* Yuri Sosero
+* Zalak Shah
 
 ## Goal
 
