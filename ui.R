@@ -52,21 +52,27 @@ body <- dashboardBody(
             # infoBoxes with fill=FALSE
             fluidRow(
               # A static valueBox
-              valueBox(width = 4, "X", "Projects", icon = icon("book")),
+              valueBox(width = 4,
+                       uiOutput("projectCount"), # <- EXAMPLE OF uiOutput
+                       "Projects", icon = icon("book")),
               # Dynamic valueBoxes
               valueBoxOutput("progressBox"),
               valueBoxOutput("approvalBox"),
               column(width = 4,
-                     valueBox(width = NULL, "X", "Archived Projects", icon = icon("book"))),
+                     valueBox(width = NULL,
+                              "X", # THIS ONE MONICA
+                              "Projects Submitted", icon = icon("book"))),
               column(width = 4,
-                     valueBox(width = NULL, "X", "Projects Published", icon = icon("book")))),
-            fluidRow(box(width = 12, height = '300px', solidHeader = TRUE, status = "primary",
+                     valueBox(width = NULL,
+                              "X", # THIS ONE TOO
+                              "Projects Published", icon = icon("book")))),
+            fluidRow(box(width = 12, solidHeader = TRUE, status = "primary", DTOutput("mainTable"),
                          title = "IPDGC Project Table"))),
     
     # Second tab content (Search project)
     tabItem(tabName = "Search_project",
             textInput("searchbar",h4("Search here using keywords:"), placeholder = "Ex: Search...GWAS"),  
-            selectInput("search_status",h4("Filter for project status: "),choices = list("In Progress","Submitted","In Review","Published")),
+            selectInput("search_status",h4("Filter for project status: "),choices = list("Any", "In Progress","Submitted","In Review","Published")),
             sliderInput("year_submitted", h4("Filter for submission year"), min = 2006, max = 2020,  c(2006, 2020)),
             selectizeInput("search_categories", h4("Filter for predefined categories (all that applied): "), width = "100%", choices = list("Functional Studies", "Bioinformatics Studies", "Multidisciplinary Studies"), multiple = TRUE),
             actionButton("searchButton", "Search!")),
@@ -94,15 +100,10 @@ body <- dashboardBody(
             selectInput("dropdown_EditProject","Select the project to edit :",
                         c("Project_1", "Project_2", "Project_3", "Project_...")),
             selectInput("EditCategory","Select the field to edit: ",
-                        c("Project Name","Project Summary","Contributors","Deliverables","Timeline","Current Status","Publication Link","Github Page Link")),
-            conditionalPanel(condition = "input.EditCategory == 'Project Name'",textInput("editName","Enter new project name: ")),
-            conditionalPanel(condition = "input.EditCategory == 'Project Summary'",textInput("editSummary","Enter new project summary: ")),
-            conditionalPanel(condition = "input.EditCategory == 'Contributors'",textInput("editContr","Enter updated contributor names: ")),
-            conditionalPanel(condition = "input.EditCategory == 'Deliverables'",textInput("editdeliv","Update deliverable: ")),
-            conditionalPanel(condition = "input.EditCategory == 'Timeline'",textInput("editTimeline","Update project timeline: ")),
-            conditionalPanel(condition = "input.EditCategory == 'Current Status'",textInput("editStatus","Update project status: ")),
-            conditionalPanel(condition = "input.EditCategory == 'Publication Link'",textInput("editLink","Add a publication link: ")),
-            conditionalPanel(condition = "input.EditCategory == 'Github Link'",textInput("editGit","Add a github link: "))),
+                        c("Project Name","Brief Summary","Primary contributors","Deliverables","Timeline","Status","Publication Link","Github")),
+            uiOutput("editInputForm"),
+            actionButton("editButton", "Submit change")
+            ),
 
     #Fifth tab content (Code info)
     tabItem(tabName = "Code",

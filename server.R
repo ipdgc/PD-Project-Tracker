@@ -10,39 +10,95 @@ shinyServer(function(input, output, session) {
   
   #read the dribble object using the googlesheets4 package
   project <- read_sheet(IPDGC_exsheet)
- 
-  output$mainTable <- renderDT({project})
+  
+  output$mainTable <- renderDT({
+    datatable(
+      project,
+      options = list(
+        scrollX=T
+      )
+    )
+  })
   #====basic search====
   observeEvent(input$searchButton, {
     df <- project[grepl(input$searchbar, project$`Project Name`, ignore.case = T) | grepl(input$searchbar, project$`Brief summary`, ignore.case = T) | grepl(input$searchbar, project$`Primary contributors`, ignore.case = T) | grepl(input$searchbar, project$`Comments from group`, ignore.case = T), ]
-    df <- df[grepl(input$search_status, df$Status), ]
+    if (input$search_status != "Any") {
+      df <- df[grepl(input$search_status, df$Status), ]
+    }
     # Date proposed here needs a bit of work...
     #df <- df[grepl(input$year_submitted, df$`Date proposed`)]
     
     # If the category field is left blank, then input is set to NULL and everything breaks down
     # must detect when it is not NULL and search
     if (!is.null(input$search_categories)) {
-      df <- df[df(input$search_categories, df$Category)]
+      if (length(input$search_categories) == 1) {
+        df <- df[grepl(input$search_categories, df$Category), ]
+      } else if (length(input$search_categories) == 2) {
+        df <- df[grepl(input$search_categories[1], df$Category) | grepl(input$search_categories[2], df$Category), ]
+      } else {
+        df <- df[grepl(input$search_categories[1], df$Category) | grepl(input$search_categories[2], df$Category) | grepl(input$search_categories[3], df$Category), ]
+      }
     }
-    output$mainTable <- renderDT({df})
-  })
-  #====editing entry====
-  observeEvent(input$editButton, {
-    # df <- project[grepl(id, project$id)]
-    insert <- data.table(
-      # replace all blanks with inputs
-      Status="",
-      `Project Name`="",
-      `Brief summary`="",
-      `Proposed by (PI)`="",
-      `Primary contributors`="",
-      `Date proposed`= "",
-      `Deliverables`="",
-      `Timeline`="",
-      `Comments from group`="",
-      unique_id = input$dropdown_EditProject
+    output$mainTable <- renderDT({
+      datatable(
+        df,
+        options = list(
+          scrollX=T
+        )
       )
-    df[grep(input$dropdown_EditProject, project$id),] <- insert
+    })
+  })
+  
+  #====editing entry====
+  # FIRST update the select entry with the unique IDs
+  updateSelectInput(
+    session,
+    "dropdown_EditProject",
+    choices = project$unique_id
+  )
+  output$editInputForm <- renderUI({
+    if (input$EditCategory == "Status") {
+      tagList(
+        selectInput(
+          "editEntry",
+          label = "Updated status:",
+          choices = list("Any", "In Progress","Submitted","In Review","Published")
+        )
+      )
+    } else {
+      tagList(
+        textInput("editEntry","Enter new entry:")
+      )
+    }
+  })
+  
+  observeEvent(input$editButton, {
+    df <- project
+    insert <- project[grepl(input$dropdown_EditProject, project$unique_id),]
+    insert[, eval(input$EditCategory)] <- input$editEntry
+    # insert <- data.table(
+    #   # replace all blanks with inputs
+    #   Status="",
+    #   `Project Name`="",
+    #   `Brief summary`="",
+    #   `Proposed by (PI)`="",
+    #   `Primary contributors`="",
+    #   `Date proposed`= "",
+    #   `Deliverables`="",
+    #   `Timeline`="",
+    #   `Comments from group`="",
+    #   unique_id = input$dropdown_EditProject
+    # )
+    df[grep(input$dropdown_EditProject, df$unique_id),] <- insert
+    showNotification("Project changed!")
+    output$mainTable <- renderDT({
+      datatable(
+        df,
+        options = list(
+          scrollX=T
+        )
+      )
+    })
   })
   #====Adding entry====
   observeEvent(input$AddButton, {
@@ -65,11 +121,25 @@ shinyServer(function(input, output, session) {
       #id = id_edit
     )
     insert$unique_id <- paste(insert$`Date proposed`, insert$`Proposed by (PI)`, sep = "_")
-    print(colnames(insert))
+    # print(colnames(insert))
     #insert <- insert %>% select(unique_id, everything())
     project <- rbind(project, insert)
     showNotification("Project submitted!")
-    output$mainTable <- renderDT({project})
+    output$mainTable <- renderDT({
+      datatable(
+        project,
+        options = list(
+          scrollX=T
+        )
+      )
+    })
+  })
+  
+  # Fancy card stuff
+  output$projectCount <- renderUI({
+    tagList(
+      nrow(project)
+    )
   })
   
 })

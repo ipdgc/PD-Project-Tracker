@@ -71,7 +71,7 @@ body <- dashboardBody(
                      valueBox(width = NULL, "X", "Archived Projects", icon = icon("book"))),
               column(width = 4,
                      valueBox(width = NULL, "X", "Projects Published", icon = icon("book")))),
-            fluidRow(box(width = 12, height = '300px', solidHeader = TRUE, status = "primary",
+            fluidRow(box(width = 12, height = '300px', solidHeader = TRUE, status = "primary", DTOutput("mainTable")
                          title = "IPDGC Project Table"))),
     
     # Second tab content (Search project)
