@@ -1,11 +1,7 @@
+
 shinyServer(function(input, output, session) {
   
-  #handles authentication. Allows R to read and write from googlesheet
-  #Not sure how this will be handled inside Shiny. 
-  #It's prompting me for authentication inside of Rstudio
-  #It may not be necessary either, since the other googlesheets4 and googledrive functions are 
-  #still asking for it
-  #gs4_auth(email = "tyrpak@usc.edu")
+  
   
   #====import project list sample====
   # create dribble object from google sheets file id (currently my example sheet)
