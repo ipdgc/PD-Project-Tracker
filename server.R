@@ -1,13 +1,20 @@
 shinyServer(function(input, output, session) {
-  # import project list sample
-  project <- fread('test_proj_list.tsv')
-  project$unique_id <- paste(project$`Date proposed`, " ", project$`Proposed by (PI)`)
-  project <- project %>% select(unique_id, everything())
+  #====import project list sample====
+  project <- fread('test_proj_list.tsv', encoding = "Latin-1")
   output$mainTable <- renderDT({project})
-  # basic search
+  #====basic search====
   observeEvent(input$searchButton, {
     df <- project[grepl(input$searchbar, project$`Project Name`, ignore.case = T) | grepl(input$searchbar, project$`Brief summary`, ignore.case = T) | grepl(input$searchbar, project$`Primary contributors`, ignore.case = T) | grepl(input$searchbar, project$`Comments from group`, ignore.case = T)]
-    output$mainTable <- renderTable({df})
+    df <- df[grepl(input$search_status, df$Status)]
+    # Date proposed here needs a bit of work...
+    #df <- df[grepl(input$year_submitted, df$`Date proposed`)]
+    
+    # If the category field is left blank, then input is set to NULL and everything breaks down
+    # must detect when it is not NULL and search
+    if (!is.null(input$search_categories)) {
+      df <- df[df(input$search_categories, df$Category)]
+    }
+    output$mainTable <- renderDT({df})
   })
   #====editing entry====
   observeEvent(input$editButton, {
@@ -23,27 +30,36 @@ shinyServer(function(input, output, session) {
       `Deliverables`="",
       `Timeline`="",
       `Comments from group`="",
-      id = id_edit
+      unique_id = input$dropdown_EditProject
       )
-    df[grep(id_edit, project$id),] <- insert
+    df[grep(input$dropdown_EditProject, project$id),] <- insert
   })
   #====Adding entry====
-  observeEvent(input$addButton, {
+  observeEvent(input$AddButton, {
     #****ADD SHINYJS THING TO MAKE INSERTION UI VISIBLE***
     insert <- data.table(
       # replace all blanks with inputs
-      Status="",
-      `Project Name`="",
-      `Brief summary`="",
-      `Proposed by (PI)`="",
-      `Primary contributors`="",
-      `Date proposed`= "",
-      `Deliverables`="",
-      `Timeline`="",
-      `Comments from group`="",
-      id = id_edit
+      Status = input$statusAdd,
+      `Project Name` = input$nameAdd,
+      `Brief summary` = input$summaryAdd,
+      `Proposed by (PI)` = input$proposedbyAdd,
+      `Primary contributors` = input$authorsAdd,
+      `Date proposed`= as.character(input$proposedateAdd),
+      `Deliverables` = input$deliverablesAdd,
+      `Timeline` = input$timelineAdd,
+      `Comments from group` = "",
+      Github = a("Link", href = input$githubAdd, target = "_blank"),
+      `Publication Link` = a("Link", input$publicationAdd, target = "_blank"),
+      `Keywords` = input$keywordsAdd,
+      `Category` = input$categoriesAdd
+      #id = id_edit
     )
+    insert$unique_id <- paste(insert$`Date proposed`, insert$`Proposed by (PI)`, sep = "_")
+    print(colnames(insert))
+    #insert <- insert %>% select(unique_id, everything())
     project <- rbind(project, insert)
+    showNotification("Project submitted!")
+    output$mainTable <- renderDT({project})
   })
   
 })
