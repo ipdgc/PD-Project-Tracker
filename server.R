@@ -1,11 +1,21 @@
+
 shinyServer(function(input, output, session) {
+  
+  
+  
   #====import project list sample====
-  project <- fread('test_proj_list.tsv', encoding = "Latin-1")
+  # create dribble object from google sheets file id (currently my example sheet)
+  #in this format, we can use the utility functions in the googledrive package
+  IPDGC_exsheet <- as_dribble(as_id("1YBUOskdNmd1ZLiNJP5F-OS58lN5vBhYtrzSF_9HWoz0"))
+  
+  #read the dribble object using the googlesheets4 package
+  project <- read_sheet(IPDGC_exsheet)
+ 
   output$mainTable <- renderDT({project})
   #====basic search====
   observeEvent(input$searchButton, {
-    df <- project[grepl(input$searchbar, project$`Project Name`, ignore.case = T) | grepl(input$searchbar, project$`Brief summary`, ignore.case = T) | grepl(input$searchbar, project$`Primary contributors`, ignore.case = T) | grepl(input$searchbar, project$`Comments from group`, ignore.case = T)]
-    df <- df[grepl(input$search_status, df$Status)]
+    df <- project[grepl(input$searchbar, project$`Project Name`, ignore.case = T) | grepl(input$searchbar, project$`Brief summary`, ignore.case = T) | grepl(input$searchbar, project$`Primary contributors`, ignore.case = T) | grepl(input$searchbar, project$`Comments from group`, ignore.case = T), ]
+    df <- df[grepl(input$search_status, df$Status), ]
     # Date proposed here needs a bit of work...
     #df <- df[grepl(input$year_submitted, df$`Date proposed`)]
     
