@@ -6,7 +6,7 @@ shinyServer(function(input, output, session) {
   output$mainTable <- renderDT({project})
   # basic search
   observeEvent(input$searchButton, {
-    df <- project[grepl(input$searchbar, project$`Project Name`) | grepl(input$searchbar, project$`Brief summary`) | grepl(input$searchbar, project$`Primary contributors`) | grepl(input$searchbar, project$`Comments from group`)]
+    df <- project[grepl(input$searchbar, project$`Project Name`, ignore.case = T) | grepl(input$searchbar, project$`Brief summary`, ignore.case = T) | grepl(input$searchbar, project$`Primary contributors`, ignore.case = T) | grepl(input$searchbar, project$`Comments from group`, ignore.case = T)]
     output$mainTable <- renderTable({df})
   })
   #====editing entry====
