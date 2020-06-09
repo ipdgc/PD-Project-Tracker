@@ -88,13 +88,7 @@ body <- dashboardBody(
             textInput("githubAdd",h3("Github page link: "),width = "100%"),
             actionButton("AddButton",h3(paste("Submit Project","\n")),width = "100%")),
    
-    tabItem(tabName = "Edit_project",
-            selectInput("dropdown","Select the project to edit :",
-                        c("Project_1", "Project_2", "Project_3", "Project_...")),
-            selectInput("editCategory","Select the field to edit: ",
-                        c("Project Name","Project Summary","Contributors","Deliverables","Timeline","Current Status","Publication Link","Github Page Link")),
-            conditionalPanel(condition = "input.editCategory == 'Timeline'", actionButton("test","Test Button"))),
-
+   
     #Fourth tab content (Edit Project)
     tabItem(tabName = "Edit_project",
             selectInput("dropdown_EditProject","Select the project to edit :",
