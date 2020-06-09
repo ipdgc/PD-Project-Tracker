@@ -48,8 +48,8 @@ shinyServer(function(input, output, session) {
       `Deliverables` = input$deliverablesAdd,
       `Timeline` = input$timelineAdd,
       `Comments from group` = "",
-      Github = a("Link", href = input$githubAdd, target = "_blank"),
-      `Publication Link` = a("Link", input$publicationAdd, target = "_blank"),
+      Github = input$githubAdd,
+      `Publication Link` = input$publicationAdd,
       `Keywords` = input$keywordsAdd,
       `Category` = input$categoriesAdd
       #id = id_edit

@@ -18,7 +18,7 @@ body <- dashboardBody(
     # Second tab content
     tabItem(tabName = "Search_project",
             textInput("searchbar",h4("Search here using keywords:"), placeholder = "Ex: Search...GWAS"),  
-            selectInput("search_status",h4("Filter for project status: "),choices = list("ongoing", "done")),
+            selectInput("search_status",h4("Filter for project status: "),choices = list("In Progress","Submitted","In Review","Published")),
             sliderInput("year_submitted", h4("Filter for submission year"), min = 2006, max = 2020,  c(2006, 2020)),
             selectizeInput("search_categories", h4("Filter for predefined categories (all that applied): "), width = "100%", choices = list("GWAS study", "WGS", "exome sequencing", "etc"), multiple = TRUE),
             actionButton("searchButton", "Search!")),
