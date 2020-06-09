@@ -3,7 +3,7 @@ shinyServer(function(input, output, session) {
   #handles authentication. Allows R to read and write from googlesheet
   #Not sure how this will be handled inside Shiny. 
   #It's prompting me for authentication inside of Rstudio
-  #gs4_auth()
+  gs4_auth()
   
   #====import project list sample====
   # create dribble object from google sheets file id (currently my example sheet)
@@ -13,7 +13,7 @@ shinyServer(function(input, output, session) {
   #read the dribble object using the googlesheets4 package
   project <- read_sheet(IPDGC_exsheet)
  
-   output$mainTable <- renderDT({project})
+  output$mainTable <- renderDT({project})
   #====basic search====
   observeEvent(input$searchButton, {
     df <- project[grepl(input$searchbar, project$`Project Name`, ignore.case = T) | grepl(input$searchbar, project$`Brief summary`, ignore.case = T) | grepl(input$searchbar, project$`Primary contributors`, ignore.case = T) | grepl(input$searchbar, project$`Comments from group`, ignore.case = T)]
