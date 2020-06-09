@@ -1,6 +1,8 @@
 shinyServer(function(input, output, session) {
   # import project list sample
   project <- fread('test_proj_list.tsv')
+  project$unique_id <- paste(project$`Date proposed`, " ", project$`Proposed by (PI)`)
+  project <- project %>% select(unique_id, everything())
   output$mainTable <- renderDT({project})
   
   observeEvent(input$searchButton, {
