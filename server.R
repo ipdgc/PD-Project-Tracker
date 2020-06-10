@@ -141,5 +141,8 @@ shinyServer(function(input, output, session) {
       nrow(project)
     )
   })
+  # Repeat for Projects Submitted
+  
+  # Repeat for Projects Published
   
 })
