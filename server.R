@@ -39,6 +39,11 @@ shinyServer(function(input, output, session) {
         df <- df[grepl(input$search_categories[1], df$Category) | grepl(input$search_categories[2], df$Category) | grepl(input$search_categories[3], df$Category), ]
       }
     }
+    df$year <- gsub("^(\\d{4}).*$", "\\1", df$`Date proposed`)
+    print(df$year)
+    df <- df[inside.range(df$year, input$`year_submitted`), ]
+    print(input$year_submitted)
+    df$year <- NULL
     output$mainTable <- renderDT({
       datatable(
         df,

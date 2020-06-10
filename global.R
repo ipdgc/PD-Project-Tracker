@@ -7,6 +7,7 @@ library(dplyr)
 library(shinydashboardPlus)
 library(googlesheets4)
 library(googledrive)
+library(spatstat.utils)
 
 #global out-of-band auth ("oob"). I dont think this is necessary if we have a service token
 options(gargle_oob_default  = TRUE)
