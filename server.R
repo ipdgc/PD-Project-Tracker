@@ -142,7 +142,17 @@ shinyServer(function(input, output, session) {
     )
   })
   # Repeat for Projects Submitted
-  
+  submitted <- subset(project, project$Status == "Submitted")
+    output$projectSubmitted <- renderUI({
+      tagList(
+        nrow (submitted)  
+    )
+  })
   # Repeat for Projects Published
-  
+  published <- subset(project, project$Status == "Published")
+    output$projectPublished <- renderUI ({
+      tagList(
+        nrow(published)
+      )
+    })
 })
