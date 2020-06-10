@@ -60,11 +60,11 @@ body <- dashboardBody(
               valueBoxOutput("approvalBox"),
               column(width = 4,
                      valueBox(width = NULL,
-                              "X", # THIS ONE MONICA
+                              uiOutput("projectSubmitted"), 
                               "Projects Submitted", icon = icon("book"))),
               column(width = 4,
                      valueBox(width = NULL,
-                              "X", # THIS ONE TOO
+                              uiOutput("projectPublished"),
                               "Projects Published", icon = icon("book")))),
             fluidRow(box(width = 12, solidHeader = TRUE, status = "primary", DTOutput("mainTable"),
                          title = "IPDGC Project Table"))),
